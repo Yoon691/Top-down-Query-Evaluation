@@ -1,0 +1,110 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                 	League of Legends Database
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%				FACTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  player(pID, role, nationality)	              key: pID
+%%  team(tID, region)				      key: tID
+%%  play(pID, tID, year)		     	      key: pID, tID
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:-type(player(pID:string,role: string,nationality:string)).
+
+player('Caps','mid','Denmark').
+player('Mikyx','support','Slovenia').
+player('Jankos','jungle','Poland').
+player('Wunder','top','Denmark').
+player('Rekkles','adc','Sweden').
+player('P1noy', 'adc', 'Denmark').
+player('Perkz','adc','Croatia').
+player('Upset','adc','Germany').
+player('Bwipo','jungle','Belgium').
+player('Nisqy','mid','Belgium').
+player('Hylissang','support','Bulgaria').
+player('Adam','top','France').
+player('Carzzy','adc','Czech').
+player('Humanoid','mid','Czech').
+player('Armut','top','Turkey').
+player('Elyoya','jungle','Spain').
+player('Kaiser','support','Germany').
+
+:-type(team(tID:string,region: string)).
+
+team('G2Esports','EUW').
+team('Fnatic','EUW').
+team('MADLions','EUW').
+
+:-type(play(pID:string,tID:string,year: int)).
+
+play('Caps','G2Esports',2021).
+play('Mikyx','G2Esports',2021).
+play('Jankos','G2Esports',2021).
+play('Wunder','G2Esports',2021).
+play('Rekkles','G2Esports',2021).
+play('P1noy','G2Esports',2021).
+play('Caps','G2Esports',2020).
+play('Mikyx','G2Esports',2020).
+play('Jankos','G2Esports',2020).
+play('Wunder','G2Esports',2020).
+play('Perkz','G2Esports',2020).
+play('P1noy','G2Esports',2020).
+play('Rekkles','Fnatic',2020).
+play('Upset','Fnatic',2021).
+play('Bwipo','Fnatic',2021).
+play('Nisqy','Fnatic',2021).
+play('Hylissang','Fnatic',2021).
+play('Adam','Fnatic',2021).
+play('Carzzy','MADLions',2021).
+play('Humanoid','MADLions',2021).
+play('Armut','MADLions',2021).
+play('Elyoya','MADLions',2021).
+play('Kaiser','MADLions',2021).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%				RULES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 1. All the names of the players with 'jungle' role.
+%% player(N,'jungle',_) -> jungleplayer(N)
+queryone(N) :- player(N,'jungle',_).
+
+% 2. All the names of the players of the MAD Lions team.
+%% player(N,_,_) AND play(N,'MADLions',_) -> madlplayer(N)
+querytwo(N) :- player(N,_,_), play(N,'MADLions',_).
+
+% 3. All the names of the players of G2 Esports in the past year.
+%% player(N,_,_) AND play(N,'G2Esports',2020) -> gtwopastteam(N)
+querythree(N) :- player(N,_,_), play(N,'G2Esports',2020).
+
+% 4. All the names of the players who played 'adc' for G2 Esports.
+%% player(N,'adc',_) AND play(N,'G2Esports',_) -> adcsgtwo(N)
+queryfour(N) :- player(N,'adc',_), play(N,'G2Esports',_).
+
+% 5. All the names of the players who played in more than one team.
+%% player(N,_,_) AND play(N,T,_) AND play(N,L,_) AND T!=L -> manyplayedteams(N) 
+queryfive(N) :- player(N,_,_), play(N,T,_), play(N,L,_),T\=L.
+
+% 6. All the nationalities of the Fnatic players.
+%% player(P,_,N) AND play(P,'Fnatic',_) -> fncnationallity(N)
+querysix(N) :- player(P,_,N), play(P,'Fnatic',_).
+
+% 7. All the names of the teams with french players.
+%% play(P,T,_) AND player(P,_,'France') -> teamswithfrench(T)
+queryseven(T) :- play(P,T,_), player(P,_,'France').
+
+% 8. All the nationalities that are repeated.
+%% player(A,_,N) AND player(B,_,N) AND A!=B -> nationrepeated(N)
+queryeight(N) :- player(A,_,N), player(B,_,N), A\=B.
+
+% 9. All the teams without german players
+%% player(P,_,'Germany') AND play(P,T,_) -> teamofgermanplayer(T)
+%% team(T,_) AND NOT teamofgermanplayer(T) -> teamnogerman(T)
+teamofgermanplayer(T) :- player(P,_,'Germany'), play(P,T,_).
+querynine(T) :- team(T,_), not teamofgermanplayer(T). 
+
+% 10. All the partners of the german players
+%% player(P,_,'Germany') -> germanplayer(P)
+%% player(P,_,_) AND germanplayer(P) AND player(Q,_,_) AND NOT germanplayer(Q) AND P!=Q AND play(P,T,Y) AND play(Q,T,Y) -> germanpartner(Q)
+germanplayer(P) :- player(P,_,'Germany').
+queryten(Q) :- player(P,_,_), germanplayer(P), player(Q,_,_), not germanplayer(Q), P\=Q, play(P,T,Y), play(Q,T,Y).
