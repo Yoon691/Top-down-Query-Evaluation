@@ -12,8 +12,8 @@ import java.util.*;
  *
  */
 public class RecursiveQsqEngine {
-    private Mapping edbRelations;
-    private Mapping idbRules;
+//    private Collection<Relation> edbRelations ;
+//    private Mapping idbRules;
 
     /**
      * A container for tracking global information passed back and forth between
@@ -198,7 +198,8 @@ public class RecursiveQsqEngine {
     }
 
     protected Set<Atom> checkIfEdbQuery(Atom q) {
-        Collection<fr.univlyon1.mif37.dex.mapping.Relation> facts = this.edbRelations.getEDB();
+        Mapping mp = new Mapping();
+        Collection<fr.univlyon1.mif37.dex.mapping.Relation> facts = mp.getEDB();
         if (facts != null) {
             Set<Atom> result = new LinkedHashSet<>();
             for (fr.univlyon1.mif37.dex.mapping.Relation fact : facts) {
@@ -212,6 +213,7 @@ public class RecursiveQsqEngine {
     }
 
     public Set<Atom> query(Atom q) {
+        Mapping mp = new Mapping();
         // Is the query for EDB facts?
         Set<Atom> edbFacts = checkIfEdbQuery(q);
         if (edbFacts != null) {
@@ -235,7 +237,7 @@ public class RecursiveQsqEngine {
         Tuple t = new Tuple(input);
         Relation r = new Relation(input.size());
         r.add(t);
-        QSQRState state = new QSQRState((Map<Object, Object>) this.idbRules);
+        QSQRState state = new QSQRState((Map<Object, Object>) mp.getIDB());
 
         qsqr(p, r, state);
 
@@ -335,11 +337,11 @@ public class RecursiveQsqEngine {
 
         QsqTemplate templ = new QsqTemplate(rule);
         sup.renameAttributes(templ.get(0));
-
+        Mapping mp = new Mapping();
         // Process rule one atom/supplemental relation at a time.
         for (int i = 1; i < templ.size(); ++i) {
             AdornedAtom a = rule.getBody().get(i - 1);
-            Collection<fr.univlyon1.mif37.dex.mapping.Relation> facts = this.edbRelations.getEDB();
+            Collection<fr.univlyon1.mif37.dex.mapping.Relation> facts = mp.getEDB();
             if (facts != null) {
                 // We have an EDB predicate.
                 facts.add(output);

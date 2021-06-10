@@ -25,8 +25,11 @@ public class App {
         LOG.info("Parsed {} edb(s), {} idb(s) and {} tgd(s).",
                 mapping.getEDB().size(),
                 mapping.getIDB().size(),
-                mapping.getTgds().size(),
-                recursiveQsqEngine.query(mapping.getTgds().));
+                mapping.getTgds().size()
+                );
+        for (int i = 0; i < mapping.getTgds().size(); i++){
+            recursiveQsqEngine.query(mapping.getTgds().get(i).getRight());
+        }
 
     }
 }

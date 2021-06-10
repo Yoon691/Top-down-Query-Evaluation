@@ -17,7 +17,7 @@ public class Mapping {
 
     private Collection<AbstractRelation> idb;
 
-    private Collection<Tgd> tgds;
+    private List<Tgd> tgds;
 
     public Mapping() {
         this.edb = new ArrayList<>();
@@ -31,7 +31,7 @@ public class Mapping {
         this.tgds = new ArrayList<>(mapping.getTgds());
     }
 
-    public Mapping(Collection<Relation> edb, Collection<AbstractRelation> idb, Collection<Tgd> tgds) {
+    public Mapping(Collection<Relation> edb, Collection<AbstractRelation> idb, List<Tgd> tgds) {
         this.edb = edb;
         this.idb = idb;
         this.tgds = tgds;
@@ -45,8 +45,8 @@ public class Mapping {
         return idb;
     }
 
-    public Collection<Tgd> getTgds() {
-        return tgds;
+    public ArrayList<Tgd> getTgds() {
+        return (ArrayList<Tgd>) tgds;
     }
 
 
